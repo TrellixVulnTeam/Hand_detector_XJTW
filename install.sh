@@ -16,6 +16,7 @@ if [ $Choice == "1" ]; then
 
         echo "** Install Bazel **"
         sudo apt update
+        sudo apt-get upgrade -y
         mkdir $HOME/bazel-3.4.1
         cd $HOME/bazel-3.4.1
         wget https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-dist.zip
