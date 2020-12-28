@@ -2,10 +2,9 @@
 
 echo """
 Menu :
-  (1) Install Bazel
-  (2) Install OpenCV
-  (3) Copmile Hand-Counting App
-  (4) Run Hand-Counting App
+  (1) Install Bazel & Install OpenCV  & Copmile Hand-Counting App
+  (2) Run Hand-Counting App
+  
 """
 read Choice
 
@@ -28,24 +27,19 @@ if [ $Choice == "1" ]; then
         echo "** Bazel installed Successfully **"
 
     fi
-
-fi
-
-elif [ $Choice == "2" ]; then
+    
     echo "** Change Libary Path **" ; sed -i "s/x86_64-linux-gnu/aarch64-linux-gnu/g" third_party/opencv_linux.BUILD
 
     echo "** Cloning MediaPipe Repo **" ; https://github.com/dspip/Hand_detector.git /$HOME
     cd /$HOME/Hand_detector ; sudo bash ./setup_opencv.sh
 
-fi
 
-elif [ $Choice == "3" ];
     echo '** Copmile Hand-Counting App **'
     cd /$HOME/Hand_detector ; bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
 
 fi
 
-elif [ $Choice == "4" ]; then
+elif [ $Choice == "2" ]; then
     echo '** Hand-Counting App **'
     cd /$HOME/Hand_detector ; GLOG_logtostderr=1 bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_gpu --calculator_graph_config_file=mediapipe/graphs/hand_tracking/hand_tracking_desktop_live_gpu.pbtxt
 
