@@ -31,8 +31,8 @@ if [ $Choice == "1" ]; then
     
     echo "** Change Libary Path **" ; sed -i "s/x86_64-linux-gnu/aarch64-linux-gnu/g" third_party/opencv_linux.BUILD
 
-    echo "** Cloning Hand_detector Repo **" ; https://github.com/dspip/Hand_detector.git /$HOME
-    cd /$HOME/Hand_detector ; sudo bash ./setup_opencv.sh
+    echo "** Cloning Hand_detector Repo **" ; https://github.com/dspip/Hand_detector.git $HOME
+    cd $HOME/Hand_detector ; sudo bash ./setup_opencv.sh
 
 
     echo '** Copmile Hand-Counting App **'
