@@ -36,12 +36,12 @@ if [ $Choice == "1" ]; then
 
 
     echo '** Copmile Hand-Counting App **'
-    cd /$HOME/Hand_detector ; bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
+    cd $HOME/Hand_detector ; bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
 
 
 elif [ $Choice == "2" ]; then
 
     echo '** Hand-Counting App **'
-    cd /$HOME/Hand_detector ; GLOG_logtostderr=1 bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_gpu --calculator_graph_config_file=mediapipe/graphs/hand_tracking/hand_tracking_desktop_live_gpu.pbtxt
+    cd $HOME/Hand_detector ; GLOG_logtostderr=1 bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_out_gpu --calculator_graph_config_file=mediapipe/graphs/hand_tracking/hand_tracking_desktop_live_gpu.pbtxt
 
 fi
