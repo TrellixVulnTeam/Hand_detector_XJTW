@@ -22,6 +22,7 @@ if [ $Choice == "1" ]; then
         wget https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-dist.zip
         sudo apt-get install build-essential openjdk-8-jdk python zip unzip -y
         unzip bazel-3.4.1-dist.zip
+        sudo chmod 777 compile.sh
         env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
         sudo cp output/bazel /usr/local/bin/
         sleep 2
