@@ -32,7 +32,7 @@ if [ $Choice == "1" ]; then
     
     echo "** Change Libary Path **" ; sed -i "s/x86_64-linux-gnu/aarch64-linux-gnu/g" third_party/opencv_linux.BUILD
 
-    echo "** Cloning Hand_detector Repo **" ; sudo git clone https://github.com/dspip/Hand_detector.git $HOME
+    echo "** Cloning Hand_detector Repo **" ; cd $HOME && sudo git clone https://github.com/dspip/Hand_detector.git
     sudo apt autoremove -y
     cd $HOME/Hand_detector ; sudo bash ./setup_opencv.sh
 
