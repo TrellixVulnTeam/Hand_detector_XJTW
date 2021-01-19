@@ -35,7 +35,7 @@ if [ $Choice == "1" ]; then
 
 
     echo '** Copmile Hand-Counting App **'
-    bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
+    sudo bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
 
 
 elif [ $Choice == "2" ]; then
