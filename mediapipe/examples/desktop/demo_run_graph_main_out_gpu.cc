@@ -146,23 +146,27 @@ DEFINE_string(output_video_path, "",
 
   LOG(INFO) << "Initialize the camera or load the video.";
   cv::VideoCapture capture;
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OPENING CAPTURE DEVICE" << std::endl;
   const bool load_video = !FLAGS_input_video_path.empty();
   if (load_video) {
     capture.open(FLAGS_input_video_path);
   } else {
     capture.open(0);
   }
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OPENED CAPTURE DEVICE ? " << capture.isOpened() << std::endl;
   RET_CHECK(capture.isOpened());
 
   cv::VideoWriter writer;
   const bool save_video = !FLAGS_output_video_path.empty();
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SETTING CAPTURE DEVICE SETTINGS" << std::endl;
   if (!save_video) {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
 #if (CV_MAJOR_VERSION >= 3) && (CV_MINOR_VERSION >= 2)
     capture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    capture.set(cv::CAP_PROP_FPS, 30);
+    capture.set(cv::CAP_PROP_FPS, 20);
 #endif
+  std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SET CAPTURE DEVICE SETTINGS ? DONE" << std::endl;
   }
 
   LOG(INFO) << "Start running the calculator graph.";
