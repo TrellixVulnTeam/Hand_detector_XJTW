@@ -13,11 +13,11 @@ client.on("error", ()=>{
 })
 
 client.on('connect', function () {
-  client.subscribe('presence', function (err) {
-    if (!err) {
-      client.publish('presence', 'Hello mqtt')
-    }
-  })
+  // client.subscribe('fingers', function (err) {
+  //   if (!err) {
+  //     client.publish('presence', 'Hello mqtt')
+  //   }
+  // })
 })
 
 const server = dgram.createSocket('udp4');
@@ -29,7 +29,7 @@ server.on('error', (err) => {
 
 server.on('message', (msg, info) => {
   console.log(`server got: ${msg} from ${info.address}:${info.port}`);
-  if(client.connected) {
+  if(client && client.connected) {
       client.publish("fingers",msg);
   }
 });
