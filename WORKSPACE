@@ -382,5 +382,38 @@ http_archive(
     sha256 = _TENSORFLOW_SHA256,
 )
 
+# ## Path Mqtt client
+# _PAHO_MQTT_C_VERSION = "v1.3.8"
+# http_archive(
+#     name = "paho_mqtt_c",
+#     urls = [
+#         "https://github.com/eclipse/paho.mqtt.c/archive/%s.zip" % _PAHO_MQTT_C_VERSION,
+#     ]
+#     build_file = "@//third_party:paho_mqtt_c.BUILD",
+# )
+
+# ## Path Mqtt client
+# _PAHO_MQTT_CPP_VERSION = "v1.2.0"
+# http_archive(
+#     name = "paho_mqtt_cpp",
+#     urls = [
+#         "https://github.com/eclipse/paho.mqtt.cpp/archive/%s.zip" % _PAHO_MQTT_CPP_VERSION,
+#     ]
+#     build_file = "@//third_party:paho_mqtt_cpp.BUILD",
+# )
+
+
+# new_local_repository(
+#     name = "paho_mqtt_cpp",
+#     build_file = "@//third_party:paho_mqtt_cpp.BUILD",
+#     path = "/usr/local",
+# )
+
+# new_local_repository(
+#     name = "paho_mqtt_c",
+#     build_file = "@//third_party:paho_mqtt_c.BUILD",
+#     path = "/usr/local",
+# )
+
 load("@org_tensorflow//tensorflow:workspace.bzl", "tf_workspace")
 tf_workspace(tf_repo_name = "org_tensorflow")
