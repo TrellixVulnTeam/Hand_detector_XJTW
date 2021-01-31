@@ -14,12 +14,20 @@
 //
 // An example of sending OpenCV webcam frames into a MediaPipe graph.
 // This example requires a linux computer and a GPU with EGL support drivers.
+#define PORT 41234
 
 #include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <chrono>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sstream>
 
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
@@ -51,8 +59,12 @@ constexpr char kHandednessStream[] = "handedness";
 constexpr char kWindowName[] = "MediaPipe";
 constexpr double pi = 3.14159265;
 
+static struct sockaddr_in servaddr;
+static int sockfd;
+
 // #define distance(x1,y1, x2,y2) (sqrt(pow(x1-x2, 2) + pow(y1-y2, 2)))
 // #define dotProduct(x1,y1,z1, x2,y2,z2) (x1*x2 +y1*y2 + z1*z2)
+
 
 typedef struct Point
 {
@@ -112,6 +124,20 @@ static inline const double angle(const Point& p11, const Point& p12, const Point
   Point v1 = vector(p11, p12);
   Point v2 = vector(p21, p22);
   return angle(v1, v2);
+}
+
+static inline std::string bts(bool b) {
+  return b ? "true" : "false";
+}
+
+static inline const std::string serializeRes(const bool *res, int count)
+{
+  std::stringstream s;
+  s << "{"
+      << "\"count\":" <<count << ","
+      << "\"fingers\":["<< bts(res[0]) << ", " << bts(res[1]) << ", " << bts(res[2]) << ", " << bts(res[3]) << ", " << bts(res[4])<<"]"
+    <<"}";
+  return s.str();
 }
 
 DEFINE_string(
@@ -336,7 +362,9 @@ DEFINE_string(output_video_path, "",
           for(int j = 0; j < 5; j++) {
             std::cout << res[j] << ", ";
           }
-          std::cout << std::endl;
+
+          std::string message = serializeRes(res, count);
+          sendto(sockfd, message.c_str(), message.length(), 0,(const struct sockaddr *) &servaddr, sizeof(servaddr));          
         }
     } else {
       frame_counter = 0;
@@ -389,8 +417,32 @@ DEFINE_string(output_video_path, "",
   return graph.WaitUntilDone();
 }
 
+void setup_udp(){
+  if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+      perror("socket creation failed");
+      exit(EXIT_FAILURE);
+  }
+  memset(&servaddr, 0, sizeof(servaddr));
+  // Filling server information
+  servaddr.sin_family = AF_INET;
+  uint port = PORT;
+  try {
+    std::cout << "before" << std::endl;
+    char *_port = std::getenv("PORT");
+    if(_port != NULL) {
+      port = atoi(_port);
+    }
+    std::cout << "after" << std::endl;
+  } catch(...) {
+    
+  }
+  servaddr.sin_port = htons(port);
+  servaddr.sin_addr.s_addr = INADDR_ANY;
+}
+
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
+  setup_udp();
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   ::mediapipe::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
