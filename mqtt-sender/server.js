@@ -1,26 +1,24 @@
 const dgram = require('dgram');
-const env = require('dotenv').config();
+const { PORT, MQTT } = require('./env.js');
 const mqtt = require('mqtt')
 
-const PORT = env.PORT || 41234
-const MQTT_SERVER = env.MQTT || 'mqtt://test.mosquitto.org';
+let client = mqtt.connect(MQTT)
+console.log(`connecting to ${MQTT}`);
 
-var client  = mqtt.connect(MQTT_SERVER)
- 
-client.on("error", ()=>{
-    console.log(`failed to connect to ${MQTT_SERVER}, exiting`);
+client.on("error", (err)=>{
+    console.log(`~~~ failed to connect to ${MQTT}, exiting.`);
+    console.log(`[ERROR] ${err}`);
     process.exit();
 })
 
 client.on('connect', function () {
-  // client.subscribe('fingers', function (err) {
-  //   if (!err) {
-  //     client.publish('presence', 'Hello mqtt')
-  //   }
-  // })
+  console.log("~~~ connected.");
 })
 
-const server = dgram.createSocket('udp4');
+const server = dgram.createSocket({
+  type: "udp4",
+  reuseAddr: true,
+});
 
 server.on('error', (err) => {
   console.log(`server error:\n${err.stack}`);
@@ -28,8 +26,8 @@ server.on('error', (err) => {
 });
 
 server.on('message', (msg, info) => {
-  console.log(`server got: ${msg} from ${info.address}:${info.port}`);
-  if(client && client.connected) {
+  // console.log(`server got: ${msg} from ${info.address}:${info.port}`);
+  if(client.connected) {
       client.publish("fingers",msg);
   }
 });
@@ -38,6 +36,5 @@ server.on('listening', () => {
   const address = server.address();
   console.log(`listening for udp packets on ${address.address}:${address.port}`);
 });
-
 
 server.bind(PORT);

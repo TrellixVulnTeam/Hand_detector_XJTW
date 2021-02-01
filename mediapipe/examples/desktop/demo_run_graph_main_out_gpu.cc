@@ -427,12 +427,10 @@ void setup_udp(){
   servaddr.sin_family = AF_INET;
   uint port = PORT;
   try {
-    std::cout << "before" << std::endl;
     char *_port = std::getenv("PORT");
     if(_port != NULL) {
       port = atoi(_port);
     }
-    std::cout << "after" << std::endl;
   } catch(...) {
     
   }
