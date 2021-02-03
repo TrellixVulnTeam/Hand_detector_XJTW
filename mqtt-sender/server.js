@@ -26,7 +26,7 @@ server.on('error', (err) => {
 });
 
 server.on('message', (msg, info) => {
-  // console.log(`server got: ${msg} from ${info.address}:${info.port}`);
+  console.log(`server got: ${msg} from ${info.address}:${info.port}`);
   if(client.connected) {
       client.publish("fingers",msg);
   }

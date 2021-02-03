@@ -130,12 +130,23 @@ static inline std::string bts(bool b) {
   return b ? "true" : "false";
 }
 
-static inline const std::string serializeRes(const bool *res, int count)
+// static inline const std::string serializeRes(const bool *res, int count)
+// {
+//   std::stringstream s;
+//   s << "{"
+//       << "\"count\":" <<count << ","
+//       << "\"fingers\":["<< bts(res[0]) << ", " << bts(res[1]) << ", " << bts(res[2]) << ", " << bts(res[3]) << ", " << bts(res[4])<<"]"
+//     <<"}";
+//   return s.str();
+// }
+
+static inline const std::string serializeRes(const bool *res, int count, std::string &label, float score)
 {
   std::stringstream s;
   s << "{"
-      << "\"count\":" <<count << ","
-      << "\"fingers\":["<< bts(res[0]) << ", " << bts(res[1]) << ", " << bts(res[2]) << ", " << bts(res[3]) << ", " << bts(res[4])<<"]"
+      << "\"count\":" << count
+      << ",\"fingers\":["<< bts(res[0]) << "," << bts(res[1]) << "," << bts(res[2]) << "," << bts(res[3]) << "," << bts(res[4])<<"]"
+      << ",\"handedness\":{\"label\":\""<<label<<"\",\"score\":"<<score<<"}"
     <<"}";
   return s.str();
 }
@@ -279,7 +290,7 @@ DEFINE_string(output_video_path, "",
     bool has_handedness = false;
     if(is_landmark_present) {
       has_landmark = poller_landmark.Next(&landmark_packet);
-      // has_handedness = handedness_poller.Next(&handedness_packet);
+      has_handedness = handedness_poller.Next(&handedness_packet);
     }
 
     if (!is_palm_present) {
@@ -298,33 +309,24 @@ DEFINE_string(output_video_path, "",
         //     std::cout << temp.label() << ", " << temp.score() << std::endl;
         //   }
         // }
-        if (has_landmark && frame_counter > frame_count_thresh) {
+        if (has_handedness && has_landmark && frame_counter > frame_count_thresh) {
+          auto &output_handedness = handedness_packet.Get<std::vector<::mediapipe::ClassificationList>>();
           auto& output_landmarks = landmark_packet.Get<std::vector<::mediapipe::NormalizedLandmarkList>>();
           int count = 0;
           double thresh_lbm = 40, thresh_lmp = 120, thresh_thumb = 55;
           double thresh_joint = 160, thresh_thumb_dist = 0.0435, fingers_dist_thresh = 0.1;
           bool res[5] = { false, false, false, false, false };
+          std::string handedness_str;
+          float handedness_prediction = 0;
           // bool skip_ear_detections = true;
 
-          for (const ::mediapipe::NormalizedLandmarkList& landmark : output_landmarks) {
-
-            // // double all_distances[21*21];
-            // for (int i = 0; i < 21 && skip_ear_detections; i++) {
-            //   Point p = _POINT(landmark, i);
-            //   for (int j = 0; j < 21 && skip_ear_detections; j++) {
-            //     double d = distance(_POINT(landmark, j), p);
-            //     if (d > fingers_dist_thresh && d > 0)
-            //       skip_ear_detections = false;
-            //     else
-            //       std::cout << "d = " << d << std::endl;
-            //   }
-            // }
-            // if (skip_ear_detections) break;
-
-            
-
+          for (int c=0; c<output_landmarks.size(); c++) {
+            const ::mediapipe::ClassificationList &handedness = output_handedness[c];
+            const ::mediapipe::NormalizedLandmarkList &landmark = output_landmarks[c];
+            auto handedness_classification = handedness.classification(0);
+            handedness_prediction = handedness_classification.score();
+            handedness_str = handedness_classification.label();
             Point base = _POINT(landmark, 0);
-
             { // thumb edge case
               Point point = _POINT(landmark, 4);
               Point finger_limit = _POINT(landmark, 5);
@@ -358,14 +360,67 @@ DEFINE_string(output_video_path, "",
               if(res[i]) count++;
             }
           }
-
-          std::cout << "Finger Counting: " << count << std::endl;
-          for(int j = 0; j < 5; j++) {
-            std::cout << res[j] << ", ";
-          }
-
-          std::string message = serializeRes(res, count);
+          std::string message = serializeRes(res, count, handedness_str, handedness_prediction);
+          std::cout << "message:\n\t" << message <<std::endl;
           sendto(sockfd, message.c_str(), message.length(), 0,(const struct sockaddr *) &servaddr, sizeof(servaddr));          
+
+          // for (const ::mediapipe::NormalizedLandmarkList& landmark : output_landmarks) {
+
+          //   // // double all_distances[21*21];
+          //   // for (int i = 0; i < 21 && skip_ear_detections; i++) {
+          //   //   Point p = _POINT(landmark, i);
+          //   //   for (int j = 0; j < 21 && skip_ear_detections; j++) {
+          //   //     double d = distance(_POINT(landmark, j), p);
+          //   //     if (d > fingers_dist_thresh && d > 0)
+          //   //       skip_ear_detections = false;
+          //   //     else
+          //   //       std::cout << "d = " << d << std::endl;
+          //   //   }
+          //   // }
+          //   // if (skip_ear_detections) break;
+
+            
+
+          //   Point base = _POINT(landmark, 0);
+
+          //   { // thumb edge case
+          //     Point point = _POINT(landmark, 4);
+          //     Point finger_limit = _POINT(landmark, 5);
+          //     Point pinky_limit = _POINT(landmark, 17);
+          //     Point middle = _POINT(landmark, 2);
+
+          //     double thumb = angle(base, point, base, pinky_limit);
+
+          //     if (point.z < 0) {
+          //       double joint_angle = angle(middle, base, middle, point);
+          //       // std::cout << "joint = " << joint_angle << std::endl;
+          //       res[0] = thumb > thresh_thumb && joint_angle > thresh_joint;
+          //     } else {
+          //       double d = distance(finger_limit, middle);
+          //       res[0] = thumb > thresh_thumb && d > thresh_thumb_dist;
+          //     }
+                
+          //     if(res[0]) count++;
+          //   }
+
+          //   for (int i=1; i<5; i++) {
+          //     int b = i * 4;
+          //     Point limit = _POINT(landmark, b+1);
+          //     Point middle = _POINT(landmark, b+2);
+          //     Point point = _POINT(landmark, b+4);
+
+          //     double lbm = angle(base, limit, base, middle);
+          //     double lmp = angle(middle, limit, middle, point);
+
+          //     res[i] = lbm < thresh_lbm && lmp > thresh_lmp;
+          //     if(res[i]) count++;
+          //   }
+          // }
+
+          // std::cout << "Finger Counting: " << count << std::endl;
+          // for(int j = 0; j < 5; j++) {
+          //   std::cout << res[j] << ", ";
+          // }
         }
     } else {
       frame_counter = 0;
