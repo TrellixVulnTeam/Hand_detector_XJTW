@@ -29,18 +29,23 @@ if [ $Choice == "1" ]; then
         sleep 2
         echo "** Bazel installed Successfully **"
     fi
+    
 elif [ $Choice == "2" ]; then
     echo "** Change OpenCV Libary Path **" ; sed -i "s/x86_64-linux-gnu/aarch64-linux-gnu/g" third_party/opencv_linux.BUILD
     sudo apt autoremove -y
     sudo bash ./setup_opencv.sh
+    
 elif [ $Choice == "3" ]; then
     echo '** Downloading mqtt-sender dependencies **'
     sudo apt-get install nodejs npm
     cd mqtt-sender && npm install
+    
 elif [ $Choice == "4" ]; then
     echo '** Copmile Hand-Counting App **'
     sudo bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
+    
 elif [ $Choice == "5" ]; then
-    echo '** Copmile Hand-Counting App **'
+    echo '** Run App **'
     ./run.sh
+    
 fi
