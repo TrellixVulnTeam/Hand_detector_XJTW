@@ -226,6 +226,7 @@ DEFINE_string(output_video_path, "",
     cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGBA);
     if (!load_video) {
       cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
+      cv::rotate(camera_frame, camera_frame, cv::ROTATE_180);
     }
     // Wrap Mat into an ImageFrame.
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
