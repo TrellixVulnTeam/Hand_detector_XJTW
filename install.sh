@@ -37,7 +37,7 @@ elif [ $Choice == "2" ]; then
     
 elif [ $Choice == "3" ]; then
     echo '** Downloading mqtt-sender dependencies **'
-    sudo apt-get install nodejs npm nodejs-dev node-gyp libssl1.0-dev
+    sudo apt-get install nodejs npm nodejs-dev node-gyp libssl1.0-dev -y
     cd mqtt-sender && npm install
     
 elif [ $Choice == "4" ]; then
