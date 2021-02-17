@@ -44,6 +44,7 @@ elif [ $Choice == "4" ]; then
     echo '** Copmile Hand-Counting App **'
     sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
     sudo apt-get install mesa-utils
+    sudo apt install libcanberra-gtk-module libcanberra-gtk3-module -y && sudo apt-get install --reinstall libcanberra-gtk-module -y
     sudo bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
     
 elif [ $Choice == "5" ]; then
