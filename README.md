@@ -12,7 +12,7 @@ $ xhost +
 ```
 Run the docker container ( Change the video device if its 0 or 1, and the -e MQTT ) :
 
-$ sudo docker run --rm -it --network="host" --gpus all --device=/dev/video1:/dev/video0 --runtime nvidia -e MQTT="mqtt://localhost:1884" -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix hand_tracker
+$ sudo docker run --rm -it --network="host" --gpus all --device=/dev/video0:/dev/video0 --runtime nvidia -e MQTT="mqtt://localhost:1884" -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix hand_tracker
 
 ```
 
