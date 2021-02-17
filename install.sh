@@ -37,11 +37,13 @@ elif [ $Choice == "2" ]; then
     
 elif [ $Choice == "3" ]; then
     echo '** Downloading mqtt-sender dependencies **'
-    sudo apt-get install nodejs npm
+    sudo apt-get install nodejs npm nodejs-dev node-gyp libssl1.0-dev
     cd mqtt-sender && npm install
     
 elif [ $Choice == "4" ]; then
     echo '** Copmile Hand-Counting App **'
+    sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
+    sudo apt-get install mesa-utils
     sudo bazel build -c opt --copt -DMESA_EGL_NO_X11_HEADERS --copt -DEGL_NO_X11 mediapipe/examples/desktop/hand_tracking:hand_tracking_out_gpu --verbose_failures
     
 elif [ $Choice == "5" ]; then
